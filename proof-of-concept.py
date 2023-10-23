@@ -1,6 +1,5 @@
 import argparse, logging
 
-import whisper 
 import transformers
 
 
