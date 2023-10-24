@@ -10,8 +10,7 @@
 #SBATCH --mail-type=FAIL,END
 #SBATCH -o assignment_1-%j
 
-#conda create -n salASR python=3.8
-#pip install -r requirements.txt
+
 conda activate salASR
 
 python proof-of-concept.py
