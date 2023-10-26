@@ -44,7 +44,6 @@ def build_saliency_map(sample):
 
     input_features.requires_grad = True
 
-    sample['input_features'] = input_features
 
     decoder_input_ids = torch.LongTensor([processor.tokenizer(sample['text']).input_ids])
 
@@ -55,13 +54,19 @@ def build_saliency_map(sample):
 
     total.backward(retain_graph=True)
 
-    return input_features.grad
+    num_samples = sample['audio']['array'].shape[0]
+    samples_per_second = sample['audio']["sampling_rate"]
+    spectrogram_frames_per_second = 100 #whisper constant
+
+    num_spectrogram_frames = num_samples * spectrogram_frames_per_second // samples_per_second
+
+    return input_features[0,:,:num_spectrogram_frames], input_features.grad[0,:,:num_spectrogram_frames]
 
 
-def top_r_features(sample):
-    saliency_map = build_saliency_map(sample)
+def top_r_features(sample, r=.25):
+    input_features, saliency_map = build_saliency_map(sample)
 
-    saliency_mask = build_saliency_mask(saliency_map)
+    saliency_mask = build_saliency_mask(saliency_map, r=r)
 
-    return sample['input_features'] * saliency_mask
+    return input_features, input_features * saliency_mask
 
