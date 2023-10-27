@@ -1,0 +1,16 @@
+-use model.forward() to use teacher forcing to see in what proportion of steps is the predicted token the correct next token
+
+-make equal # of cells masked per spectrogram frame (timestamp)
+    -check whether there is currently an imbalance across different frequency bins
+
+-try different formulas for saliency (beyond just magnitude of gradient)
+
+
+- it could just be out of domain
+-maybe using more bins would help? I know you can do this in hf but idk how rn
+    -maybe this for part II of the project
+
+
+-try models larger than "tiny"
+
+!vocode the new spectrograms
