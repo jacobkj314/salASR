@@ -13,6 +13,6 @@ def saliency_mask(saliency: torch.Tensor, r=.5, k=None):
 def visualize(spectrogram, filename):
     plt.cla()
     plt.figure(figsize=(300,8),dpi=100)
-    plt.imshow(spectrogram.detach().numpy())
+    plt.imshow(spectrogram.flip([0]).detach().numpy()) # .flip() reverses the order of the rows, so that, in the visualization, lower pitches appear lower on the y-axis
     plt.colorbar()
     plt.savefig(filename)
