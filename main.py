@@ -21,9 +21,11 @@ def get_spectrogram(instance):
 
 
 
-def build_saliency_mask(saliency: torch.Tensor, r=.5):
+def build_saliency_mask(saliency: torch.Tensor, r=.5, balanced=True):
     k = int(r * saliency.numel())
     saliency_abs = saliency.abs()
+    if balanced:
+        return (saliency_abs >= saliency_abs.T.topk(k //(saliency.shape[-1])).values.min(dim=-1).values)
     return (saliency_abs >= saliency_abs.flatten().topk(k).values.min())
 
 def mask_unsalient_features(features: torch.Tensor, mask):
