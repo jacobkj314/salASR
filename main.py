@@ -3,8 +3,8 @@ from transformers import WhisperProcessor, WhisperForConditionalGeneration
 from datasets import load_dataset
 
 #load processor and model
-processor = WhisperProcessor.from_pretrained("openai/whisper-large")
-model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-large") # # # model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-large")
+processor = WhisperProcessor.from_pretrained("openai/whisper-tiny")
+model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-tiny") # # # model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-large")
 model.config.forced_decoder_ids = None
 
 #load dataset
@@ -18,7 +18,9 @@ def get_spectrogram(instance):
     spectrogram_frames_per_second = 100 # whisper constant
     num_spectrogram_frames = num_audio_samples * spectrogram_frames_per_second // samples_per_second +1
     return  processor(array, sampling_rate=samples_per_second, return_tensors="pt").input_features[0,:,:num_spectrogram_frames]
-
+#get tokens from dataset instance
+def get_decoder_input_ids(instance):
+    return torch.LongTensor([processor.tokenizer(instance['text']).input_ids])
 
 
 def build_saliency_mask(saliency: torch.Tensor, r=.5, balanced=True):
@@ -50,13 +52,12 @@ def pad_for_whisper(features):
     padded_tensor = torch.nn.functional.pad(features, (0, padding[1], 0, 0), mode='constant', value=float(ambient_intensity))
     return padded_tensor[None]
 
-def build_saliency_map(features : torch.Tensor, text):
+def build_saliency_map(features : torch.Tensor, decoder_input_ids):
     '''
     '''
     #Get inputs for model
     features.requires_grad = True
     input_features = pad_for_whisper(features)
-    decoder_input_ids = torch.LongTensor([processor.tokenizer(text).input_ids])
     #Get output logits at each time step
     model_output = model.forward(input_features, decoder_input_ids=decoder_input_ids)
     logits = model_output.logits[0]
@@ -69,10 +70,27 @@ def build_saliency_map(features : torch.Tensor, text):
 def transcribe(features):
     return processor.batch_decode(model.generate(pad_for_whisper(features)), skip_special_tokens=True)[0]
 
-def top_r_features(instance, r=.25):
+def top_r_features(instance, r=.25, balanced=True):
     features : torch.Tensor = get_spectrogram(instance)
-    text = instance['text']
-    saliency_map = build_saliency_map(features, text)
-    mask = build_saliency_mask(saliency_map, r=r)
+    decoder_input_ids = get_decoder_input_ids(instance)
+    saliency_map = build_saliency_map(features, decoder_input_ids)
+    mask = build_saliency_mask(saliency_map, r=r, balanced=balanced)
     return mask_unsalient_features(features, mask)
 
+
+
+def evaluate(instance, features=None):
+    #get the inputs to the model
+    features : torch.Tensor = features if features is not None else get_spectrogram(instance)
+    input_features = pad_for_whisper(features)
+    decoder_input_ids : torch.LongTensor = get_decoder_input_ids(instance)
+    #get the outputs from the model
+    decoder_output_ids = model.forward(input_features, decoder_input_ids=decoder_input_ids).logits.argmax(dim=-1)
+    #count up how many of them match to give a score to the model
+    return float((decoder_input_ids[0,1:] == decoder_output_ids[0,:-1]).sum() / (decoder_input_ids.numel() -1))
+
+
+    
+def ablate(instance):
+    for i in range(10):
+        print(((10-i)/10), evaluate(instance, top_r_features(instance, r=((10-i)/10))))

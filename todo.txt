@@ -1,6 +1,8 @@
 -use model.forward() to use teacher forcing to see in what proportion of steps is the predicted token the correct next token
+        DONE
 
 -make equal # of cells masked per spectrogram frame (timestamp)
+    DONE
     -check whether there is currently an imbalance across different frequency bins
 
 -try different formulas for saliency (beyond just magnitude of gradient)
