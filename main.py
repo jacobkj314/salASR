@@ -23,9 +23,13 @@ def get_decoder_input_ids(instance):
     return torch.LongTensor([processor.tokenizer(instance['text']).input_ids])
 
 
-def build_saliency_mask(saliency: torch.Tensor, r=.5, balanced=True):
+def build_saliency_mask(saliency: torch.Tensor, r=.5, balanced=True, translucent=True):
     k = int(r * saliency.numel())
-    saliency_abs = saliency.abs()
+    saliency_abs : torch.Tensor = saliency.abs()
+    if translucent:
+        if balanced:
+            return saliency_abs.softmax(dim=0)
+        return saliency_abs.flatten().softmax(dim=0).reshape(saliency_abs.shape)
     if balanced:
         return (saliency_abs >= saliency_abs.T.topk(k //(saliency.shape[-1])).values.min(dim=-1).values)
     return (saliency_abs >= saliency_abs.flatten().topk(k).values.min())
