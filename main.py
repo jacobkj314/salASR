@@ -19,8 +19,10 @@ def get_spectrogram(instance):
     num_spectrogram_frames = num_audio_samples * spectrogram_frames_per_second // samples_per_second +1
     return  processor(array, sampling_rate=samples_per_second, return_tensors="pt").input_features[0,:,:num_spectrogram_frames]
 #get tokens from dataset instance
-def get_decoder_input_ids(instance):
-    return torch.LongTensor([processor.tokenizer(instance['text']).input_ids])
+def get_decoder_input_ids(instance, use_gold=False):
+    if use_gold:
+        return torch.LongTensor([processor.tokenizer(instance['text']).input_ids])
+    return torch.LongTensor(model(pad_for_whisper(get_spectrogram(instance))))
 
 
 def build_saliency_mask(saliency: torch.Tensor, r=.5, balanced=True, translucent=True):
@@ -66,7 +68,7 @@ def build_saliency_map(features : torch.Tensor, decoder_input_ids):
     model_output = model.forward(input_features, decoder_input_ids=decoder_input_ids)
     logits = model_output.logits[0]
     #Sum up the logits for the predicted tokens at each step
-    total = logits.gather(1, decoder_input_ids.T).sum() # # # # # total = logits.gather(1, logits.argmax(dim=1)[None].T).sum() # # # # # should we use gold tokens or predicted tokens ?
+    total = logits.gather(1, logits.argmax(dim=1)[None].T).sum() # # # # # total = logits.gather(1, decoder_input_ids.T).sum() # # # # # using predicted instead of gold tokens
     #backward pass
     total.backward(retain_graph=True)
     return features.grad
