@@ -9,7 +9,7 @@ def main():
     print(f"Loaded data")
     tiny_scores = []
     for sample in ds.take(10):
-        tiny_scores.append(whisper_evaluator.evaluate(sample, whisper_evaluator.top_r_features(sample, r=0.1)))
+        tiny_scores.append(whisper_evaluator.evaluate(sample, whisper_evaluator.top_r_features(sample, r=1.0)))
     print(f"tiny_scores:{tiny_scores}")
     with open("tiny_output.txt", "w") as op_file:
         for score in tiny_scores:

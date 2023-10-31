@@ -12,7 +12,10 @@ def pad_for_whisper(features):
     padded_tensor = torch.nn.functional.pad(features, (0, padding[1], 0, 0), mode='constant', value=float(ambient_intensity))
     return padded_tensor[None]
 
-def build_saliency_mask(saliency: torch.Tensor, r=.5, balanced=True, translucent=True):
+def build_saliency_mask(saliency: torch.Tensor, r=.5, balanced=True, translucent=False):
+    """
+    translucent=True is not working, don't use
+    """
     k = int(r * saliency.numel())
     saliency_abs : torch.Tensor = saliency.abs()
     if translucent:
