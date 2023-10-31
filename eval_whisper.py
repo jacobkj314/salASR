@@ -55,7 +55,7 @@ class EvalWhisper:
     def get_decoder_input_ids(self, instance, use_gold=False):
         if use_gold:
             return torch.LongTensor([self.processor.tokenizer(instance['text']).input_ids])
-        return torch.LongTensor(self.model(EvalWhisper.pad_for_whisper(self.get_spectrogram(instance))))
+        return torch.LongTensor(self.model.generate(EvalWhisper.pad_for_whisper(self.get_spectrogram(instance))))
         
     def build_saliency_map(self, features : torch.Tensor, decoder_input_ids):
         '''
@@ -78,7 +78,7 @@ class EvalWhisper:
     def top_r_features(self, instance, r=.25, balanced=True):
         features : torch.Tensor = self.get_spectrogram(instance)
         decoder_input_ids = self.get_decoder_input_ids(instance)
-        saliency_map = EvalWhisper.build_saliency_map(features, decoder_input_ids)
+        saliency_map = self.build_saliency_map(features, decoder_input_ids)
         mask = EvalWhisper.build_saliency_mask(saliency_map, r=r, balanced=balanced)
         return EvalWhisper.mask_unsalient_features(features, mask)
 
@@ -107,10 +107,12 @@ def main():
     model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-tiny") # # # model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-large")
     model.config.forced_decoder_ids = None
     whisper_evaluator = EvalWhisper(model, processor)
-    ds = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation")
+    ds = load_dataset("librispeech_asr", split="validation.clean")
+    print(f"Loaded data")
     tiny_scores = []
     for sample in ds.select(list(range(10))):
         tiny_scores.append(whisper_evaluator.evaluate(sample, whisper_evaluator.top_r_features(sample, r=0.1)))
+    print(f"tiny_scores:{tiny_scores}")
     with open("tiny_output.txt", "w") as op_file:
         for score in tiny_scores:
             op_file.write(str(score)+"\n")
