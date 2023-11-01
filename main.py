@@ -44,6 +44,6 @@ if __name__ == "__main__":
     parser.add_argument("-n", "--num_samples", type=int, default=10)
     parser.add_argument("-m", "--model_size", type=str, default="tiny")
     parser.add_argument("-o", "--output_dir", type=str, default="./")
-    parser.add_argument("-r", "--r_value", type=int, default=1.0)
+    parser.add_argument("-r", "--r_value", type=float, default=1.0)
     args = parser.parse_args()
     main(args)
