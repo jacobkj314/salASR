@@ -30,10 +30,10 @@ def main(args):
     print(f"Loading model . . . ")
     whisper_evaluator = EvalWhisper(f"openai/whisper-{model_size}")
     print(f"Loaded model")
-    ds = load_dataset("librispeech_asr", split="validation.clean") #, streaming=True)
+    ds = load_dataset("librispeech_asr", split="validation.clean", streaming=True)
     print(f"Loaded data")
     scores_list = []
-    for sample in tqdm(ds.select(list(range(num_samples)))):  #tqdm(ds.take(num_samples)):
+    for sample in tqdm(ds.take(num_samples)):
         scores_list.append(whisper_evaluator.evaluate(sample, whisper_evaluator.top_r_features(sample, r=r_value)))
     print(f"scores_list:{scores_list}")
     output_path = output_dir / "output.json"
