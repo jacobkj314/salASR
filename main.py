@@ -6,6 +6,7 @@ import statistics
 from EvalWhisper import EvalWhisper
 
 from datasets import load_dataset
+from tqdm import tqdm
 
 def calculate_stats(scores_list):
     return statistics.mean(scores_list), statistics.stdev(scores_list)

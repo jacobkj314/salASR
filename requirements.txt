@@ -1,6 +1,6 @@
 transformers
 datasets
-
+tqdm
 soundfile
 librosa
 torch
