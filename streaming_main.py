@@ -24,9 +24,9 @@ def main(args):
     num_skipped = args.num_skipped
     num_samples = args.num_samples
     model_size = args.model_size
-    output_dir = Path(args.output_dir)
-    output_file = args.output_file
     r_value = args.r_value
+    output_dir = Path(args.output_dir)
+    output_file = str(r_value) + "_" + args.output_file
     #load processor and model
     print(f"Loading model . . . ")
     whisper_evaluator = EvalWhisper(f"openai/whisper-{model_size}")
