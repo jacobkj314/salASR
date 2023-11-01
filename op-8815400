@@ -1,8 +1,0 @@
-Could not find conda environment: whisper
-You can list all discoverable environments with `conda info --envs`.
-
-Loading model . . . 
-Loaded model
-Loaded data
-0it [00:00, ?it/s]1it [01:28, 88.09s/it]2it [01:30, 37.84s/it]2it [01:30, 45.38s/it]
-scores_list:[1.0, 0.970588207244873]

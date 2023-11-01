@@ -16,8 +16,8 @@ conda activate salASR
 
 mkdir -p /scratch/general/vast/u0403624/huggingface_cache
 export TRANSFORMERS_CACHE="/scratch/general/vast/u0403624/huggingface_cache"
-export HF_DATASETS_CACHE="/scratch/general/vast/uu0403624/huggingface_cache"
+export HF_DATASETS_CACHE="/scratch/general/vast/u0403624/huggingface_cache"
 
-OUT_DIR=/scratch/general/vast/u0403624/salASR/streaming_outputs/output
+OUT_DIR=/scratch/general/vast/u0403624/salASR/streaming_outputs/output-7
 mkdir -p $OUT_DIR
-python streaming_main.py -s 200 -n 100 -m tiny -o $OUT_DIR -r 0.9
+python streaming_main.py -s 200 -n 100 -m large -o $OUT_DIR -r 0.9
