@@ -21,7 +21,7 @@ def dump_output(scores_list, mean, standard_deviation, output_path):
 
 def main(args):
     # parse args
-    args = parser.parse_args()
+    num_skipped = args.num_skipped
     num_samples = args.num_samples
     model_size = args.model_size
     output_dir = Path(args.output_dir)
@@ -33,10 +33,10 @@ def main(args):
     ds = load_dataset("librispeech_asr", split="validation.clean", streaming=True)
     print(f"Loaded data")
     scores_list = []
-    for sample in tqdm(ds.take(num_samples)):
+    for sample in tqdm(ds.skip(num_skipped).take(num_samples)):
         scores_list.append(whisper_evaluator.evaluate(sample, whisper_evaluator.top_r_features(sample, r=r_value)))
     print(f"scores_list:{scores_list}")
-    output_path = output_dir / "output.json"
+    output_path = output_dir / f"output.json"
     mean, standard_deviation = calculate_stats(scores_list)
     dump_output(scores_list, mean, standard_deviation, output_path)
     
@@ -44,6 +44,7 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--num_skipped", type=int, default=0)
     parser.add_argument("-n", "--num_samples", type=int, default=10)
     parser.add_argument("-m", "--model_size", type=str, default="tiny")
     parser.add_argument("-o", "--output_dir", type=str, default="./")
