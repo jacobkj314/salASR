@@ -34,10 +34,10 @@ def main(args):
     ds = load_dataset("librispeech_asr", split="validation.clean", streaming=True)
     print(f"Loaded data")
     scores_list = []
-    with open(output_dir / output_file, "a") as score_writer:
-        for sample in tqdm(ds.take(num_samples)):
-            score = whisper_evaluator.evaluate(sample, whisper_evaluator.top_r_features(sample, r=r_value))
-            scores_list.append(score)
+    for sample in tqdm(ds.take(num_samples)):
+        score = whisper_evaluator.evaluate(sample, whisper_evaluator.top_r_features(sample, r=r_value))
+        scores_list.append(score)
+        with open(output_dir / output_file, "a") as score_writer:
             score_writer.write(str(score) + "\n")
     print(f"scores_list:{scores_list}")
     output_path = output_dir / f"output.json"
