@@ -1,26 +1,41 @@
 import argparse
+import json
 from pathlib import Path
+import statistics
+
 from EvalWhisper import EvalWhisper
 
 from datasets import load_dataset
+
+def calculate_stats(scores_list):
+    return statistics.mean(scores_list), statistics.stdev(scores_list)
+
+def dump_output(scores_list, mean, standard_deviation, output_path):
+    output_dict = {}
+    output_dict["mean"] = mean
+    output_dict["standard_deviation"] = standard_deviation
+    output_dict["scores"] = scores_list
+    with open(output_path, "w") as output_file:
+        json.dump(output_dict, output_file)
 
 def main(args):
     # parse args
     args = parser.parse_args()
     num_samples = args.num_samples
     model_size = args.model_size
-    output_dir = Path(args.output_path)
+    output_dir = Path(args.output_dir)
     #load processor and model
-    whisper_evaluator = EvalWhisper("openai/whisper-{model_size}")
+    whisper_evaluator = EvalWhisper(f"openai/whisper-{model_size}")
     ds = load_dataset("librispeech_asr", split="validation.clean", streaming=True)
     print(f"Loaded data")
     scores_list = []
     for sample in ds.take(num_samples):
-        scores_list.append(whisper_evaluator.evaluate(sample, whisper_evaluator.top_r_features(sample, r=1.0)))
+        scores_list.append(whisper_evaluator.evaluate(sample, whisper_evaluator.top_r_features(sample, r=0.7)))
     print(f"scores_list:{scores_list}")
-    with open(output_dir / "output.txt", "w") as op_file:
-        for score in scores_list:
-            op_file.write(str(score)+"\n")
+    output_path = output_dir / "output.json"
+    mean, standard_deviation = calculate_stats(scores_list)
+    dump_output(scores_list, mean, standard_deviation, output_path)
+    
 
 
 if __name__ == "__main__":
