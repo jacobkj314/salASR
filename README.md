@@ -2,7 +2,7 @@
     salASR: Salience for Automatic Speech Recognition
 </h1>
 <p>
-    This repository contains pre for the project on extending common explainability approaches used in Deep Learning literature to the task of Automatic Speech Recognition. This project was done for the course CS 6966 Local Explanations for Deep Learning Models taught by Professor Ana Marasovic. 
+    This repository contains code for the project on extending common explainability approaches used in Deep Learning literature to the task of Automatic Speech Recognition. This project was done for the course CS 6966 Local Explanations for Deep Learning Models taught by Professor Ana Marasovic. 
 </p>
 <h2>
     Contributors

@@ -108,6 +108,13 @@ parser.add_argument(
     help='Random seed', 
     default=13
 )
+
+parser.add_argument(
+    "-r",
+    type=float,
+    help="Percentage of input spectogram features to retain (Balanced by default)",
+    default=1.0
+)
 #----------------------------------------------------------------------
 def checkIfExists(path, isDir=False, createIfNotExists=False): 
     if isDir and not path.endswith("/"):
@@ -135,8 +142,32 @@ def checkFile(fileName, fileExtension=None):
         raise RuntimeError(f"[checkFile] {fileName} is not a file!")
 #----------------------------------------------------------------------
 class PrepareDataset():
-    def __init__(self, processor):
+    def __init__(self, processor, r=None, balanced=True):
         self.processor = processor 
+        self.r = r 
+        self.balanced = balanced
+    
+    def mask_unsalient_features(self, features: torch.Tensor, mask):
+        ambient_intensity = features.min()
+        return  (
+                    (features - ambient_intensity)  # Shift ambient intensity to 0 ...
+                    * mask                          # ... then mask ...
+                    + ambient_intensity             # ... then shift back
+                )
+    
+    def build_saliency_mask(self, saliency: torch.Tensor, r=.5, balanced=True):
+        k = int(r * saliency.numel())
+        saliency_abs : torch.Tensor = saliency.abs()
+        if balanced:
+            return (saliency_abs >= saliency_abs.T.topk(k //(saliency.shape[-1])).values.min(dim=-1).values)
+        return (saliency_abs >= saliency_abs.flatten().topk(k).values.min())
+
+    def top_r_features(self, instance, r=.25, balanced=True):
+        assert self.r != None
+        features : torch.Tensor = self.get_spectrogram(instance)
+        saliency_map = torch.rand(features.shape)
+        mask = self.build_saliency_mask(saliency=saliency_map, r=r, balanced=balanced)
+        return self.mask_unsalient_features(features, mask)
 
     def get_spectrogram(self, instance):
         assert self.processor != None
@@ -148,10 +179,16 @@ class PrepareDataset():
         return  self.processor(array, sampling_rate=samples_per_second, return_tensors="pt").input_features[0,:,:num_spectrogram_frames]
     
     def __call__(self, instance):
-        instance.update({
-            "input_features": self.get_spectrogram(instance),
-            "labels": self.processor.tokenizer(instance["text"]).input_ids
-        })
+        if self.r == None or self.r == 1:
+            instance.update({
+                "input_features": self.get_spectrogram(instance),
+                "labels": self.processor.tokenizer(instance["text"]).input_ids
+            })
+        else: 
+            instance.update({
+                "input_features": self.top_r_features(instance, self.r, self.balanced),
+                "labels": self.processor.tokenizer(instance["text"]).input_ids
+            })
         return instance
 #----------------------------------------------------------------------
 class DataCollatorSpeechSeq2SeqWithPadding:
@@ -236,8 +273,17 @@ def main(errTrace="main"):
         device = "cpu"
 
     if args.batchSize <= 0:
-        raise ValueError("[main] Batch Size has to be a positive number!")
+        raise ValueError("[{}] Batch Size has to be a positive number!".format(errTrace))
+    
+    if args.numEpochs <= 0:
+        raise ValueError("[{}] No. of epochs has to be a positive number!".format(errTrace))
 
+    if not (0 <= args.r <= 1.0):
+        raise ValueError("[{}] r has to be a value in [0, 1]!".format(errTrace))
+
+    logging.info(args)
+
+    checkIfExists(args.outputDir, isDir=True, createIfNotExists=True)
 
     model = WhisperForConditionalGeneration.from_pretrained(MODELS[args.model][args.size], cache_dir=args.cacheDir)
     processor = WhisperProcessor.from_pretrained(MODELS[args.model][args.size], cache_dir=args.cacheDir)
@@ -248,10 +294,10 @@ def main(errTrace="main"):
 
     trainDS = load_dataset(args.dataset, split=TRAIN_SPLIT, streaming=True, cache_dir=args.cacheDir)
     valDS = load_dataset(args.dataset, split=VAL_SPLIT, streaming=True, cache_dir=args.cacheDir)
-    trainDS = trainDS.take(args.numInstances)
-    valDS = valDS.take(args.numInstances)
-    trainDS = trainDS.map(PrepareDataset(processor))
-    valDS = valDS.map(PrepareDataset(processor))
+    trainDS = trainDS.take(args.numSamples)
+    valDS = valDS.take(args.numSamples)
+    trainDS = trainDS.map(PrepareDataset(processor, args.r))
+    valDS = valDS.map(PrepareDataset(processor, args.r))
 
     dataCollator = DataCollatorSpeechSeq2SeqWithPadding(processor=processor)
 
@@ -261,7 +307,7 @@ def main(errTrace="main"):
         gradient_accumulation_steps=1,  # increase by 2x for every 2x decrease in batch size
         learning_rate=args.learningRate,
         warmup_steps=0,
-        max_steps=10,
+        max_steps=(args.numEpochs)*args.numSamples,
         gradient_checkpointing=True,
         fp16=False,
         evaluation_strategy="steps",
