@@ -1,4 +1,6 @@
 import torch
+import numpy as np
+import librosa
 from utils import pad_for_whisper, build_saliency_mask, mask_unsalient_features
 
 from transformers import WhisperProcessor, WhisperForConditionalGeneration
@@ -68,3 +70,15 @@ class EvalWhisper:
     def ablate(self, instance):
         for i in range(10):
             print(((10-i)/10), self.evaluate(instance, self.top_r_features(instance, r=((10-i)/10))))
+
+
+
+    def sonify(self, spectrogram):
+        return librosa.istft(
+                                np.abs  (
+                                            np.dot  (
+                                                        np.inalg.pinv(self.processor.feature_extractor.mel_filters).T,
+                                                        10**(4 * spectrogram - 4)
+                                                    )
+                                        ) ** 0.5
+                            )
