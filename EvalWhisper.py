@@ -74,11 +74,29 @@ class EvalWhisper:
 
 
     def sonify(self, spectrogram):
+        '''        undo_spec = spectrogram
+
+        undo_spec = 4.0 * undo_spec - 4.0
+        # # # I can't' undo log_spec = np.maximum(log_spec, log_spec.max() - 8.0)
+        # # # maybe I can undo log_spec = log_spec[:, :-1] # # # I don't need to
+
+        undo_spec = 10**undo_spec 
+
+        mel_filters_pseudo_inverse = np.linalg.pinv(mel_filters)
+        linear_spectrogram = np.dot(mel_filters_pseudo_inverse.T, undo_spec)
+
+        linear_spectrogram = np.abs(linear_spectrogram) ** (0.5)
+
+        audio_signal = librosa.istft(linear_spectrogram, hop_length=hop_length, win_length=window_length)
+        return audio_signal'''
+
         return librosa.istft(
                                 np.abs  (
                                             np.dot  (
                                                         np.linalg.pinv(self.processor.feature_extractor.mel_filters).T,
                                                         10**(4 * spectrogram - 4)
                                                     )
-                                        ) ** 0.5
+                                        ) ** 0.5,
+                                hop_length=self.processor.feature_extractor.hop_length,
+                                win_length=self.processor.feature_extractor.window_length
                             )
