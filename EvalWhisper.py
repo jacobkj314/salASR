@@ -13,6 +13,9 @@ class EvalWhisper:
         self.model = WhisperForConditionalGeneration.from_pretrained(model_checkpoint)
         self.model.config.forced_decoder_ids = None
 
+        #for sonify()
+        
+
     #get spectrograms from dataset instance
     def get_spectrogram(self, instance):
         array = instance['audio']["array"]
@@ -98,5 +101,5 @@ class EvalWhisper:
                                                     )
                                         ) ** 0.5,
                                 hop_length=self.processor.feature_extractor.hop_length,
-                                win_length=self.processor.feature_extractor.window_length
+                                win_length=self.processor.feature_extractor.n_fft
                             )
