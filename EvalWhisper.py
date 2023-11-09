@@ -77,7 +77,7 @@ class EvalWhisper:
         return librosa.istft(
                                 np.abs  (
                                             np.dot  (
-                                                        np.inalg.pinv(self.processor.feature_extractor.mel_filters).T,
+                                                        np.linalg.pinv(self.processor.feature_extractor.mel_filters).T,
                                                         10**(4 * spectrogram - 4)
                                                     )
                                         ) ** 0.5
