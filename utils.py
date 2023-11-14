@@ -12,10 +12,38 @@ def pad_for_whisper(features):
     padded_tensor = torch.nn.functional.pad(features, (0, padding[1], 0, 0), mode='constant', value=float(ambient_intensity))
     return padded_tensor[None]
 
-def build_saliency_mask(saliency: torch.Tensor, r=.5, balanced=True, translucent=False):
+
+
+def build_saliency_mask(saliency: torch.Tensor, r=.5, balanced=True, translucent=False, mode="retain", where="top"):
     """
     translucent=True is not working, don't use
     """
+    if balanced == False:
+        print("balanced=False for build_saliency_mask is no longer supported, ignoring this and using balanced=True")
+
+    assert where in {"top", "bottom", "random"}
+    assert mode in {"retain", "remove"}
+    remove_top = (mode == "remove")
+    
+    if where == "bottom":
+        r = 1-r
+        remove_top = not remove_top
+
+    k = int(r * saliency.numel())
+
+    if where == "random":
+        mask = torch.rand_like(saliency)
+        mask = (mask >= mask.T.topk(k //(mask.shape[-1])).values.min(dim=-1).values)
+    else: #where in {"top", "bottom"} #if "bottom" then 
+        saliency_abs : torch.Tensor = saliency.abs()
+        mask = (saliency_abs >= saliency_abs.T.topk(k //(saliency.shape[-1])).values.min(dim=-1).values)
+
+    if remove_top:
+        mask = ~mask
+
+    return mask
+
+    # # # # # Dead code
     k = int(r * saliency.numel())
     saliency_abs : torch.Tensor = saliency.abs()
     if translucent:
