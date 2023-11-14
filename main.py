@@ -27,6 +27,8 @@ def main(args):
     output_dir = Path(args.output_dir)
     output_file = args.output_file
     r_value = args.r_value
+    mode_value = args.mode
+    what_to_mask = args.what
     #load processor and model
     print(f"Loading model . . . ")
     whisper_evaluator = EvalWhisper(f"openai/whisper-{model_size}")
@@ -36,7 +38,7 @@ def main(args):
     scores_list = []
     with open(output_dir / output_file, "a") as score_writer:
         for sample in tqdm(ds.take(num_samples)):
-            score = whisper_evaluator.evaluate(sample, whisper_evaluator.top_r_features(sample, r=r_value))
+            score = whisper_evaluator.evaluate(sample, whisper_evaluator.top_r_features(sample, r=r_value, mode=mode_value, where=what_to_mask))
             scores_list.append(score)
             score_writer.write(str(score) + "\n")
     print(f"scores_list:{scores_list}")
@@ -53,5 +55,19 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output_dir", type=str, default="./")
     parser.add_argument("-f", "--output_file", type=str, default="output.txt")
     parser.add_argument("-r", "--r_value", type=float, default=1.0)
+    parser.add_argument("--mode", type=str, default="retain")
+    parser.add_argument('--mode',
+                    default='retain',
+                    const='retain',
+                    nargs='?',
+                    choices=["retain", "remove"],
+                    help='arg for retaining/removing top_r feats (default: %(default)s)')
+    parser.add_argument('--what',
+                    default='top',
+                    const='top',
+                    nargs='?',
+                    choices=["top", "bottom", "random"],
+                    help='Specifies which part of the feature space the mask acts on to retin/remove the features (default: %(default)s)')
+
     args = parser.parse_args()
     main(args)

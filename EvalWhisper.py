@@ -49,11 +49,11 @@ class EvalWhisper:
     def transcribe(self, features):
         return self.processor.batch_decode(self.model.generate(pad_for_whisper(features)), skip_special_tokens=True)[0]
 
-    def top_r_features(self, instance, r=.25, balanced=True):
+    def top_r_features(self, instance, r=.25, balanced=True, mode="retain", where="top"):
         features : torch.Tensor = self.get_spectrogram(instance)
         decoder_input_ids = self.get_decoder_input_ids(instance)
         saliency_map = self.build_saliency_map(features, decoder_input_ids)
-        mask = build_saliency_mask(saliency_map, r=r, balanced=balanced)
+        mask = build_saliency_mask(saliency_map, r=r, balanced=balanced, mode=mode, where=where)
         return mask_unsalient_features(features, mask)
 
 
