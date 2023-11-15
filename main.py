@@ -20,15 +20,15 @@ def dump_output(scores_list, mean, standard_deviation, output_path):
         json.dump(output_dict, output_file)
 
 def main(args):
-    # parse args
-    args = parser.parse_args()
+    num_skipped = args.num_skipped
     num_samples = args.num_samples
     model_size = args.model_size
-    output_dir = Path(args.output_dir)
-    output_file = args.output_file
     r_value = args.r_value
     mode_value = args.mode
     what_to_mask = args.what
+    output_dir = Path(args.output_dir)
+    output_file = f"r{r_value}_mode{mode_value}_mask{what_to_mask}" + "_" + args.output_file
+    
     #load processor and model
     print(f"Loading model . . . ")
     whisper_evaluator = EvalWhisper(f"openai/whisper-{model_size}")
@@ -42,7 +42,7 @@ def main(args):
             scores_list.append(score)
             score_writer.write(str(score) + "\n")
     print(f"scores_list:{scores_list}")
-    output_path = output_dir / "output.json"
+    output_path = output_dir / f"output_r{r_value}_mode{mode_value}_mask{what_to_mask}.json"
     mean, standard_deviation = calculate_stats(scores_list)
     dump_output(scores_list, mean, standard_deviation, output_path)
     
@@ -50,12 +50,12 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--num_skipped", type=int, default=0)
     parser.add_argument("-n", "--num_samples", type=int, default=10)
     parser.add_argument("-m", "--model_size", type=str, default="tiny")
     parser.add_argument("-o", "--output_dir", type=str, default="./")
     parser.add_argument("-f", "--output_file", type=str, default="output.txt")
     parser.add_argument("-r", "--r_value", type=float, default=1.0)
-    parser.add_argument("--mode", type=str, default="retain")
     parser.add_argument('--mode',
                     default='retain',
                     const='retain',
