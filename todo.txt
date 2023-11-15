@@ -1,9 +1,14 @@
--use model.forward() to use teacher forcing to see in what proportion of steps is the predicted token the correct next token
-        DONE
+- Finetuning the models in ROAR-style
+	WIP
 
--make equal # of cells masked per spectrogram frame (timestamp)
-    DONE
-    -check whether there is currently an imbalance across different frequency bins
+- Test the off-the-shelf model with different r values and compare the random masking vs top/bottom-r masking scores 
+	WIP
+
+- !vocode the new spectrograms
+
+
+-graded/translucent mask to better represent the disribution of different saliency scores
+
 
 -try different formulas for saliency (beyond just magnitude of gradient)
 
@@ -14,8 +19,8 @@
 
 
 -try models larger than "tiny"
+   DONE
 
-!vocode the new spectrograms
-
-
--graded/translucent mask to better represent the disribution of different saliency scores
+-use model.forward() to use teacher forcing to see in what proportion of steps is the predicted token the correct next token
+        DONE
+    -check whether there is currently an imbalance across different frequency bins
