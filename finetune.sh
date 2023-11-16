@@ -9,20 +9,20 @@
 #SBATCH -o outputs-%j
 #SBATCH --export=ALL
 
-export PYTHONPATH=/scratch/general/vast/u1419542/miniconda3/envs/finetuneWhisperEnv/bin/python
-source /scratch/general/vast/u1419542/miniconda3/etc/profile.d/conda.sh
+export PYTHONPATH=/scratch/general/vast/<UID_HERE>/miniconda3/envs/finetuneWhisperEnv/bin/python
+source /scratch/general/vast/<UID_HERE>/miniconda3/etc/profile.d/conda.sh
 conda activate finetuneWhisperEnv
 
-mkdir -p /scratch/general/vast/u1419542/huggingface_cache
-export TRANSFORMERS_CACHE="/scratch/general/vast/u1419542/huggingface_cache"
-export HF_DATASETS_CACHE="/scratch/general/vast/u1419542/huggingface_cache"
+mkdir -p /scratch/general/vast/<UID_HERE>/huggingface_cache
+export TRANSFORMERS_CACHE="/scratch/general/vast/<UID_HERE>/huggingface_cache"
+export HF_DATASETS_CACHE="/scratch/general/vast/<UID_HERE>/huggingface_cache"
 
 NUM_SAMPLES=100
-MODEL_SIZE="tiny"
+MODEL_SIZE="large"
 NUM_EPOCHS=10
 BATCH_SIZE=16
 LEARNING_RATE=2e-5
-R=1.0
+R=-1
 while getopts 'b:e:l:n:s:r:'  opt; do
   case "$opt" in
     b) BATCH_SIZE="$OPTARG" ;; 
@@ -36,7 +36,7 @@ while getopts 'b:e:l:n:s:r:'  opt; do
   esac
 done
 
-OUT_DIR=/scratch/general/vast/u1419542/cs6966/salASR/models/$R/
+OUT_DIR=/scratch/general/vast/<UID_HERE>/cs6966/salASR/models/$R/
 mkdir -p $OUT_DIR
 
 python3 finetuneWhisper.py -info -out $OUT_DIR -cacheDir $TRANSFORMERS_CACHE -size $MODEL_SIZE -numSamples $NUM_SAMPLES -numEpochs $NUM_EPOCHS -batchSize $BATCH_SIZE -learningRate $LEARNING_RATE -r $R

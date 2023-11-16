@@ -112,8 +112,8 @@ parser.add_argument(
 parser.add_argument(
     "-r",
     type=float,
-    help="Percentage of input spectogram features to retain (Balanced by default)",
-    default=1.0
+    help="Percentage of input spectogram features to retain (Balanced by default) (set to -1 for random r for every instance)",
+    default=-1
 )
 #----------------------------------------------------------------------
 def checkIfExists(path, isDir=False, createIfNotExists=False): 
@@ -163,7 +163,8 @@ class PrepareDataset():
         return (saliency_abs >= saliency_abs.flatten().topk(k).values.min())
 
     def top_r_features(self, instance, r=.25, balanced=True):
-        assert self.r != None
+        if r == -1:
+            r = min(100, max((int(torch.rand(1).item()*100), 10)))/100
         features : torch.Tensor = self.get_spectrogram(instance)
         saliency_map = torch.rand(features.shape)
         mask = self.build_saliency_mask(saliency=saliency_map, r=r, balanced=balanced)
@@ -278,8 +279,8 @@ def main(errTrace="main"):
     if args.numEpochs <= 0:
         raise ValueError("[{}] No. of epochs has to be a positive number!".format(errTrace))
 
-    if not (0 <= args.r <= 1.0):
-        raise ValueError("[{}] r has to be a value in [0, 1]!".format(errTrace))
+    if not ((0 <= args.r <= 1.0) or args.r == -1):
+        raise ValueError("[{}] r has to be a value in [0, 1] U {-1}!".format(errTrace))
 
     logging.info(args)
 
@@ -310,12 +311,13 @@ def main(errTrace="main"):
         max_steps=(args.numEpochs)*args.numSamples,
         gradient_checkpointing=True,
         fp16=False,
-        evaluation_strategy="steps",
+        evaluation_strategy="epoch",
+        save_strategy="epoch",
         per_device_eval_batch_size=args.batchSize,
         predict_with_generate=True,
         generation_max_length=MAX_LENGTH,
         save_steps=1,
-        eval_steps=1,
+        # eval_steps=1,
         logging_steps=1,
         load_best_model_at_end=True,
         metric_for_best_model="wer",
