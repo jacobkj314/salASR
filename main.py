@@ -56,7 +56,7 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--num_skipped", type=int, default=0)
     parser.add_argument("-n", "--num_samples", type=int, default=10)
     parser.add_argument("-c", "--model_checkpoint", type=str, default="")
-    parser.add_argument("-m", "--model_size", type=str, default="tiny")
+    parser.add_argument("-m", "--model_size", type=str, default="large")
     parser.add_argument("-o", "--output_dir", type=str, default="./")
     parser.add_argument("-f", "--output_file", type=str, default="output.txt")
     parser.add_argument("-r", "--r_value", type=float, default=1.0)
