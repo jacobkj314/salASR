@@ -8,8 +8,8 @@ from transformers import WhisperProcessor, WhisperForConditionalGeneration
 
 class EvalWhisper:
 
-    def __init__(self, model_checkpoint):
-        self.processor = WhisperProcessor.from_pretrained(model_checkpoint)
+    def __init__(self, model_checkpoint, processor_checkpoint=None):
+        self.processor = WhisperProcessor.from_pretrained(model_checkpoint if processor_checkpoint is None else processor_checkpoint)
         self.model = WhisperForConditionalGeneration.from_pretrained(model_checkpoint)
         self.model.config.forced_decoder_ids = None
 

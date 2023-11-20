@@ -30,10 +30,11 @@ def main(args):
     output_file = f"r{r_value}_mode{mode_value}_mask{what_to_mask}" + "_" + args.output_file
 
     model_checkpoint = f"openai/whisper-{model_size}" if args.model_checkpoint == "" else args.model_checkpoint
+    processor_checkpoint = [f"openai/whisper-{model_size}"] if args.model_checkpoint != "" else []
     
     #load processor and model
     print(f"Loading model . . . ({model_checkpoint})")
-    whisper_evaluator = EvalWhisper(model_checkpoint)
+    whisper_evaluator = EvalWhisper(model_checkpoint, *processor_checkpoint)
     print(f"Loaded model")
     ds = load_dataset("librispeech_asr", split="validation.clean", streaming=True)
     print(f"Loaded data")

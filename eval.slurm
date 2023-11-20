@@ -15,14 +15,14 @@
 # REPLACE any string with #### with your own values/paths, etc.,
 # In short, search for #### in this file and replace all of them
 
-#UID=####
+U_ID=u0403624
 source ~/miniconda3/etc/profile.d/conda.sh
-conda activate ####
+conda activate finetuneWhisperEnv
 
-mkdir -p /scratch/general/vast/$UID/huggingface_cache
-export TRANSFORMERS_CACHE=/scratch/general/vast/$UID/huggingface_cache
-export HF_DATASETS_CACHE=/scratch/general/vast/$UID/huggingface_cache
+mkdir -p /scratch/general/vast/$U_ID/huggingface_cache
+export TRANSFORMERS_CACHE=/scratch/general/vast/$U_ID/huggingface_cache
+export HF_DATASETS_CACHE=/scratch/general/vast/$U_ID/huggingface_cache
 
-OUT_DIR=/scratch/general/vast/$UID/#### salASR/masked_outputs/
+OUT_DIR=/scratch/general/vast/$U_ID/salASR/masked_outputs/
 mkdir -p $OUT_DIR
-python main.py -s 0 -n 100 -m large -o $OUT_DIR --mode remove --what random -r 0.9
+python main.py -s 0 -n 100 -o $OUT_DIR --mode remove --what random -r 1 -c /scratch/general/vast/u0403624/cs6966/salASR/models/current/checkpoint-1440
