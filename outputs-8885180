@@ -1,0 +1,5 @@
+/uufs/notchpeak.peaks/sys/var/slurm/slurmd.spool/notch369//job8885180/slurm_script: line 41: UID_HERE: No such file or directory
+Traceback (most recent call last):
+  File "/uufs/chpc.utah.edu/common/home/u0403624/salASR/finetuneWhisper.py", line 6, in <module>
+    from transformers import WhisperForConditionalGeneration, WhisperProcessor, Seq2SeqTrainer, Seq2SeqTrainingArguments
+ModuleNotFoundError: No module named 'transformers'

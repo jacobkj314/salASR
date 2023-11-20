@@ -1,0 +1,25 @@
+/uufs/notchpeak.peaks/sys/var/slurm/slurmd.spool/notch369//job8885148/slurm_script: line 15: /scratch/general/vast/u0403624/miniconda3/etc/profile.d/conda.sh: No such file or directory
+
+CommandNotFoundError: Your shell has not been properly configured to use 'conda activate'.
+To initialize your shell, run
+
+    $ conda init <SHELL_NAME>
+
+Currently supported shells are:
+  - bash
+  - fish
+  - tcsh
+  - xonsh
+  - zsh
+  - powershell
+
+See 'conda init --help' for more information and options.
+
+IMPORTANT: You may need to close and restart your shell after running 'conda init'.
+
+
+/uufs/notchpeak.peaks/sys/var/slurm/slurmd.spool/notch369//job8885148/slurm_script: line 41: UID_HERE: No such file or directory
+Traceback (most recent call last):
+  File "/uufs/chpc.utah.edu/common/home/u0403624/salASR/finetuneWhisper.py", line 6, in <module>
+    from transformers import WhisperForConditionalGeneration, WhisperProcessor, Seq2SeqTrainer, Seq2SeqTrainingArguments
+ModuleNotFoundError: No module named 'transformers'

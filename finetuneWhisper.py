@@ -335,7 +335,7 @@ def main(errTrace="main"):
         tokenizer=processor.tokenizer,
     )
 
-    trainer.train()
+    trainer.train()#resume_from_checkpoint="/scratch/general/vast/u0403624/cs6966/salASR/models/-1/checkpoint-480")
 #----------------------------------------------------------------------
 if __name__=="__main__":
     main()

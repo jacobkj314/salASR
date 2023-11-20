@@ -28,10 +28,12 @@ def main(args):
     what_to_mask = args.what
     output_dir = Path(args.output_dir)
     output_file = f"r{r_value}_mode{mode_value}_mask{what_to_mask}" + "_" + args.output_file
+
+    model_checkpoint = f"openai/whisper-{model_size}" if args.model_checkpoint == "" else model_checkpoint
     
     #load processor and model
-    print(f"Loading model . . . ")
-    whisper_evaluator = EvalWhisper(f"openai/whisper-{model_size}")
+    print(f"Loading model . . . ({model_checkpoint})")
+    whisper_evaluator = EvalWhisper(model_checkpoint)
     print(f"Loaded model")
     ds = load_dataset("librispeech_asr", split="validation.clean", streaming=True)
     print(f"Loaded data")
@@ -52,6 +54,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--num_skipped", type=int, default=0)
     parser.add_argument("-n", "--num_samples", type=int, default=10)
+    parser.add_argument("-c", "--model_checkpoint", type=str, default="")
     parser.add_argument("-m", "--model_size", type=str, default="tiny")
     parser.add_argument("-o", "--output_dir", type=str, default="./")
     parser.add_argument("-f", "--output_file", type=str, default="output.txt")
