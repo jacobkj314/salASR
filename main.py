@@ -29,7 +29,7 @@ def main(args):
     output_dir = Path(args.output_dir)
     output_file = f"r{r_value}_mode{mode_value}_mask{what_to_mask}" + "_" + args.output_file
 
-    model_checkpoint = f"openai/whisper-{model_size}" if args.model_checkpoint == "" else model_checkpoint
+    model_checkpoint = f"openai/whisper-{model_size}" if args.model_checkpoint == "" else args.model_checkpoint
     
     #load processor and model
     print(f"Loading model . . . ({model_checkpoint})")
