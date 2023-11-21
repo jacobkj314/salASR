@@ -1,9 +1,0 @@
-INFO:root:Using GPU: cuda
-INFO:root:Namespace(info=True, logFile=None, cacheDir='/scratch/general/vast/u0403624/huggingface_cache', dataset='librispeech_asr', model='whisper', size='large', numSamples=500, numEpochs=3, batchSize=16, learningRate=2e-05, outputDir='/scratch/general/vast/u0403624/cs6966/salASR/models/-1/', seed=13, r=-1.0)
-WARNING:datasets.builder:No config specified, defaulting to: librispeech_asr/all
-WARNING:datasets.builder:No config specified, defaulting to: librispeech_asr/all
-WARNING:accelerate.utils.other:Detected kernel version 4.18.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
-  0%|          | 0/1500 [00:00<?, ?it/s]There seems to be not a single sample in your epoch_iterator, stopping training at step 480! This is expected if you're using an IterableDataset and set num_steps (1500) higher than the number of available samples.
-                                          0%|          | 0/1500 [08:42<?, ?it/s]                                          0%|          | 0/1500 [09:34<?, ?it/s]  0%|          | 0/1500 [09:34<?, ?it/s]
-{'eval_loss': 0.778670072555542, 'eval_wer': 38.10725552050473, 'eval_runtime': 373.3041, 'eval_samples_per_second': 1.339, 'eval_steps_per_second': 0.086, 'epoch': 14.02}
-{'train_runtime': 574.9024, 'train_samples_per_second': 41.746, 'train_steps_per_second': 2.609, 'train_loss': 0.0, 'epoch': 14.02}

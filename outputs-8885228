@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "/uufs/chpc.utah.edu/common/home/u0403624/salASR/finetuneWhisper.py", line 6, in <module>
-    from transformers import WhisperForConditionalGeneration, WhisperProcessor, Seq2SeqTrainer, Seq2SeqTrainingArguments
-ModuleNotFoundError: No module named 'transformers'
