@@ -13,7 +13,7 @@ from datasets import load_dataset
 from tqdm import tqdm
 
 
-def get_audio(output_path, whisper_evaluator, inputs, mask_ratios, mode_value, what_to_mask_list, sampling_rate=16000):
+def get_audio(output_path, whisper_evaluator, inputs, mask_ratios, mode_value, what_to_mask_list, sampling_rate=16000, num_skipped=0):
     output_audio_list = []
     
     
@@ -21,9 +21,9 @@ def get_audio(output_path, whisper_evaluator, inputs, mask_ratios, mode_value, w
         masked_spectrograms = []
         original_spectrogram = whisper_evaluator.get_spectrogram(input)
         # print(f"os:{original_spectrogram.shape}")
-        sf.write(f"{output_path}/{idx}_original_all.wav", input["audio"]["array"], sampling_rate) #whisper_evaluator.top_r_features(input, r=1.0, mode="retain", where="top").detach().numpy()
-        sf.write(f"{output_path}/{idx}_{10}_all.wav", whisper_evaluator.sonify(original_spectrogram), sampling_rate) #whisper_evaluator.top_r_features(input, r=1.0, mode="retain", where="top").detach().numpy()
-        with open(f"{output_path}/{idx}_original_transcription.txt", "w") as op_file:
+        #sf.write(f"{output_path}/{idx+num_skipped}_original_all.wav", input["audio"]["array"], sampling_rate) #whisper_evaluator.top_r_features(input, r=1.0, mode="retain", where="top").detach().numpy()
+        #sf.write(f"{output_path}/{idx+num_skipped}_{10}_all.wav", whisper_evaluator.sonify(original_spectrogram), sampling_rate) #whisper_evaluator.top_r_features(input, r=1.0, mode="retain", where="top").detach().numpy()
+        with open(f"{output_path}/{idx+num_skipped}_original_transcription.txt", "w") as op_file:
             op_file.write(input["text"] + "\n")
         for mask_ratio in tqdm(mask_ratios):
             mask_list = []
@@ -31,7 +31,7 @@ def get_audio(output_path, whisper_evaluator, inputs, mask_ratios, mode_value, w
                 masked_spectrogram = whisper_evaluator.top_r_features(input, r=mask_ratio, mode=mode_value, where=mask)
                 masked_audio = whisper_evaluator.sonify(masked_spectrogram.detach().numpy())
                 mask_list.append(masked_audio)
-                sf.write(f"{output_path}/{idx}_{int(mask_ratio * 10)}_{mask[0]}.wav", masked_audio, sampling_rate)
+                sf.write(f"{output_path}/{idx+num_skipped}_{int(mask_ratio * 10)}_{mask[0]}.wav", masked_audio, sampling_rate)
             masked_spectrograms.append(mask_list)
 
     
@@ -61,7 +61,7 @@ def main(args):
     inputs = []
     for sample in tqdm(ds.skip(skip_to_index).take(num_samples)):
         inputs.append(sample)
-    get_audio(output_path, whisper_evaluator, inputs, mask_ratios, mode_value, what_to_mask_list)
+    get_audio(output_path, whisper_evaluator, inputs, mask_ratios, mode_value, what_to_mask_list, num_skipped=num_skipped)
 
 
 if __name__ == "__main__":
