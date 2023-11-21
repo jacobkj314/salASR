@@ -56,8 +56,8 @@ def main(args):
     mask_ratios = [0.8, 0.5, 0.2]
     mode_value = "retain"
     what_to_mask_list = ["top", "bottom", "random"]
-    num_samples = 3
-    skip_to_index = 0
+    # num_samples = 3
+    skip_to_index = num_skipped
     inputs = []
     for sample in tqdm(ds.skip(skip_to_index).take(num_samples)):
         inputs.append(sample)
