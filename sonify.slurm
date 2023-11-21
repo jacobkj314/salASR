@@ -23,6 +23,6 @@ mkdir -p /scratch/general/vast/$U_ID/huggingface_cache
 export TRANSFORMERS_CACHE=/scratch/general/vast/$U_ID/huggingface_cache
 export HF_DATASETS_CACHE=/scratch/general/vast/$U_ID/huggingface_cache
 
-OUT_DIR=/scratch/general/vast/$U_ID/salASR/dummy_audio_outputs_0_30/
+OUT_DIR=/scratch/general/vast/$U_ID/salASR/audio_outputs_0_30/
 mkdir -p $OUT_DIR
-python sonify.py -s 0 -n 2 -o $OUT_DIR/dummy_op1/
+python sonify.py -s 30 -n 30 -o $OUT_DIR/
