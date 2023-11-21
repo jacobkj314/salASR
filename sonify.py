@@ -41,7 +41,7 @@ def main(args):
     output_path = Path(args.output_dir)
     
     model_size = "large"
-    model_checkpoint = f"openai/whisper-{model_size}"
+    model_checkpoint = "/scratch/general/vast/u0403624/cs6966/salASR/models/current/checkpoint-1440" #f"openai/whisper-{model_size}"
     processor_checkpoint = [f"openai/whisper-{model_size}"]
     #load processor and model
     print(f"Loading model . . . ({model_checkpoint})")

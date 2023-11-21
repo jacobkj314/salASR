@@ -25,4 +25,4 @@ export HF_DATASETS_CACHE=/scratch/general/vast/$U_ID/huggingface_cache
 
 OUT_DIR=/scratch/general/vast/$U_ID/salASR/audio_outputs_0_30/
 mkdir -p $OUT_DIR
-python sonify.py -s 30 -n 30 -o $OUT_DIR/
+python sonify.py -s 2 -n 28 -o $OUT_DIR/
