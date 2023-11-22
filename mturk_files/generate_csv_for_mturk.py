@@ -1,6 +1,7 @@
 #import pandas as pd
 
-instance_digits = [0,1,2,3,4,5]
+audios_per_hit = 18
+
 where_digits = ['t','b','r']
 r_digits = ['2','5','8']
 
@@ -13,7 +14,7 @@ def audio(hit, a):
     hit = hit % 9
 
 
-    instance = 6*block + a
+    instance = audios_per_hit*block + a
 
     where = where_digits[(a + (hit % 3)) % 3]
 
@@ -22,8 +23,8 @@ def audio(hit, a):
     return f'https://jacob.ml/salASR/audios/{instance}_{r}_{where}.wav'
 
 with open("mturk.csv", "w") as writer:
-    writer.write(",".join(f"audio{i}" for i in range(6))+"\n")
-    for hit in range(90):
-        writer.write(",".join(audio(hit, a) for a in range(6))+"\n")
+    writer.write(",".join(f"audio{i}" for i in range(audios_per_hit))+"\n")
+    for hit in range(18):
+        writer.write(",".join(audio(hit, a) for a in range(audios_per_hit))+"\n")
 
 
