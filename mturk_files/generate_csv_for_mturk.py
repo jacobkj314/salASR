@@ -19,7 +19,7 @@ def audio(hit, a):
 
     r = r_digits[(a + hit) % 3]
 
-    return f'https://jacob.ml/salASR/audios/{instance}_{where}_{r}.wav'
+    return f'https://jacob.ml/salASR/audios/{instance}_{r}_{where}.wav'
 
 with open("mturk.csv", "w") as writer:
     writer.write(",".join(f"audio{i}" for i in range(6))+"\n")
