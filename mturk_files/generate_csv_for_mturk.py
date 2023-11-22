@@ -16,7 +16,7 @@ def audio(hit, a):
 
     instance = audios_per_hit*block + a
 
-    where = where_digits[(a + (hit % 3)) % 3]
+    where = where_digits[(a + (hit // 3)) % 3]
 
     r = r_digits[(a + hit) % 3]
 
