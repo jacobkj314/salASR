@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=32
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:a100:1
-#SBATCH --time=2:00:00
+#SBATCH --time=3:00:00
 #SBATCH --mem=40GB
 #SBATCH --mail-user=####
 #SBATCH --mail-type=FAIL,END
@@ -25,4 +25,4 @@ export HF_DATASETS_CACHE=/scratch/general/vast/$U_ID/huggingface_cache
 
 OUT_DIR=/scratch/general/vast/$U_ID/salASR/masked_outputs/
 mkdir -p $OUT_DIR
-python main.py -s 0 -n 100 -o $OUT_DIR --mode retain --what random -r 1 -c /scratch/general/vast/u0403624/cs6966/salASR/models/current/checkpoint-1440
+python main.py -s $1 -n 100 -k 1500 -o $OUT_DIR --mode $3 --what random -r $2 -c /scratch/general/vast/u0403624/cs6966/salASR/models/current/checkpoint-1440
