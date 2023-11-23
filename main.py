@@ -27,7 +27,7 @@ def main(args):
     mode_value = args.mode
     what_to_mask = args.what
     output_dir = Path(args.output_dir)
-    output_file = f"r{r_value}_mode{mode_value}_mask{what_to_mask}" + "_" + args.output_file
+    output_file = f"r{r_value}_mode{mode_value}_mask{what_to_mask}_instance{num_skipped}" + "_" + args.output_file
 
     model_checkpoint = f"openai/whisper-{model_size}" if args.model_checkpoint == "" else args.model_checkpoint
     processor_checkpoint = [f"openai/whisper-{model_size}"] if args.model_checkpoint != "" else []
@@ -39,17 +39,23 @@ def main(args):
     ds = load_dataset("librispeech_asr", split="validation.clean", streaming=True)
     print(f"Loaded data")
     scores_list = []
-    with open(output_dir / output_file, "a") as score_writer:
-        for sample in tqdm(ds.take(num_samples)):
-            score = whisper_evaluator.evaluate(sample, whisper_evaluator.top_r_features(sample, r=r_value, mode=mode_value, where=what_to_mask))
-            scores_list.append(score)
+    for sample in tqdm(ds.take(num_samples)):
+        score = whisper_evaluator.evaluate(sample, whisper_evaluator.top_r_features(sample, r=r_value, mode=mode_value, where=what_to_mask))
+        scores_list.append(score)
+        with open(output_dir / output_file, "a") as score_writer:
             score_writer.write(str(score) + "\n")
-    print(f"scores_list:{scores_list}")
-    output_path = output_dir / f"output_r{r_value}_mode{mode_value}_mask{what_to_mask}.json"
-    mean, standard_deviation = calculate_stats(scores_list)
-    dump_output(scores_list, mean, standard_deviation, output_path)
+    #print(f"scores_list:{scores_list}")
+    #output_path = output_dir / f"output_r{r_value}_mode{mode_value}_mask{what_to_mask}.json"
+    #mean, standard_deviation = calculate_stats(scores_list)
+    #dump_output(scores_list, mean, standard_deviation, output_path)
     
-
+def start_next_job(args):
+    next_num_skipped = args.num_skipped + 100
+    if next_num_skipped >= args.kill_index:
+        return
+    else:
+        from os import system
+        system(f'b eval_part.slurm {next_num_skipped} {args.r_value}')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -60,6 +66,7 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output_dir", type=str, default="./")
     parser.add_argument("-f", "--output_file", type=str, default="output.txt")
     parser.add_argument("-r", "--r_value", type=float, default=1.0)
+    parser.add_argument("-k", "--kill_index", type=int, default=1500)
     parser.add_argument('--mode',
                     default='retain',
                     const='retain',
@@ -75,3 +82,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     main(args)
+    start_next_job(args)
