@@ -169,10 +169,10 @@ def main(errTrace="main"):
     checkIfExists("./plots/", isDir=True, createIfNotExists=True)
     plt.clf()
     plt.title("WER for user transcriptions")
-    plt.xlabel("Masking percentage (r)")
+    plt.xlabel("Retain percentage (r)")
     plt.ylabel("Average Word Error Rate (WER)")
     pltLegend = []
-    print("Average WERs by strategy and masking percentage")
+    print("Average WERs by strategy and retain percentage")
     for strategy in wers:
         print("{}:".format(STRATEGY_2_LABEL[strategy]))
         Rs = []
