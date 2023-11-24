@@ -26,8 +26,12 @@ def main(args):
     r_value = args.r_value
     mode_value = args.mode
     what_to_mask = args.what
-    output_dir = Path(args.output_dir)
-    output_file = f"r{r_value}_mode{mode_value}_mask{what_to_mask}_instance{num_skipped}" + "_" + args.output_file
+    output_dir = Path(args.output_dir) / what_to_mask / str(num_skipped) / str(r_value)
+    if not output_dir.exists():
+        output_dir.mkdir(parents=True)
+    output_file = args.output_file
+
+    already_calculated_lines = len(open(output_dir / output_file).readlines()) if (output_dir / output_file).exists() else 0
 
     model_checkpoint = f"openai/whisper-{model_size}" if args.model_checkpoint == "" else args.model_checkpoint
     processor_checkpoint = [f"openai/whisper-{model_size}"] if args.model_checkpoint != "" else []
@@ -39,7 +43,7 @@ def main(args):
     ds = load_dataset("librispeech_asr", split="validation.clean", streaming=True)
     print(f"Loaded data")
     scores_list = []
-    for sample in tqdm(ds.take(num_samples)):
+    for sample in tqdm(ds.skip(num_skipped).skip(already_calculated_lines).take(num_samples)):
         score = whisper_evaluator.evaluate(sample, whisper_evaluator.top_r_features(sample, r=r_value, mode=mode_value, where=what_to_mask))
         scores_list.append(score)
         with open(output_dir / output_file, "a") as score_writer:
