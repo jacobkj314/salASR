@@ -50,12 +50,12 @@ def main(args):
     #dump_output(scores_list, mean, standard_deviation, output_path)
     
 def start_next_job(args):
-    next_num_skipped = args.num_skipped + 100
+    next_num_skipped = args.num_skipped + args.num_samples
     if next_num_skipped >= args.kill_index:
         return
     else:
         from os import system
-        system(f'b eval_part.slurm {next_num_skipped} {args.r_value}')
+        system(f'b eval_part.slurm {next_num_skipped} {args.r_value} {args.what}')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
