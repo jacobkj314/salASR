@@ -43,7 +43,7 @@ def main(args):
     ds = load_dataset("librispeech_asr", split="validation.clean", streaming=True)
     print(f"Loaded data")
     scores_list = []
-    for sample in tqdm(ds.skip(num_skipped).skip(already_calculated_lines).take(num_samples)):
+    for sample in tqdm(ds.skip(num_skipped).skip(already_calculated_lines).take(num_samples - already_calculated_lines)):
         score = whisper_evaluator.evaluate(sample, whisper_evaluator.top_r_features(sample, r=r_value, mode=mode_value, where=what_to_mask))
         scores_list.append(score)
         with open(output_dir / output_file, "a") as score_writer:
