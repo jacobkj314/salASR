@@ -67,8 +67,22 @@ def mask_unsalient_features(features: torch.Tensor, mask):
             )
 
 def visualize(spectrogram, filename):
+    seconds = spectrogram.shape[1] // 100
+    fs = 40
     plt.cla()
-    plt.figure(figsize=(300,8),dpi=100)
+    plt.figure(figsize=(10*seconds,8),dpi=100)
     plt.imshow(spectrogram.flip([0]).detach().numpy()) # .flip() reverses the order of the rows, so that, in the visualization, lower pitches appear lower on the y-axis
-    plt.colorbar()
+    plt.tick_params(#remove ticks from y-axis
+        axis='y',
+        which='both',
+        left=False,
+        right=False,
+        labelleft=False,
+        labelright=False
+    )
+    #cb = plt.colorbar(shrink=0.75 ,pad=0.2)
+    #cb.ax.tick_params(labelsize=fs)
+    plt.xlabel('Time (s)', fontsize=fs)
+    plt.xticks([i*100 for i in range(seconds +1)], [str(i) for i in range(seconds+1)], fontsize=fs)
+    plt.ylabel('Frequency ', fontsize=fs)
     plt.savefig(filename)
